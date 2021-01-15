@@ -198,7 +198,7 @@ const shuffleArray = (array: any) => {
   }
 };
 
-let test = getRestaurantIdsWithFilter("chinese");
+let test = getRestaurantIdsWithFilter("mexican");
 test.then((res: any) => shuffleArray(res));
 test
   .then((res: any) => {

@@ -171,7 +171,7 @@ const shuffleArray = (array) => {
         array[j] = temp;
     }
 };
-let test = getRestaurantIdsWithFilter("chinese");
+let test = getRestaurantIdsWithFilter("mexican");
 test.then((res) => shuffleArray(res));
 test
     .then((res) => {
