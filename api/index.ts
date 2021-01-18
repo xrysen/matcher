@@ -17,6 +17,11 @@ app.get('/', (req: any, res: any) => {
   });
 });
 
+app.get('/mobile', (req: any, res: any) => {
+  console.log("Someone connected!");
+  res.json({test: "Coming from the backend!"});
+});
+
 const port = process.env.PORT || 9000;
 
 app.listen(port);
