@@ -1,0 +1,21 @@
+.swiper {
+  display: flex;
+  flex-direction: column
+}
+
+.restaurant {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.carousel-img {
+  height: 500px;
+  width: 500px;
+}
