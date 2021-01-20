@@ -29,18 +29,6 @@ app.get('/', (req: any, res: any) => {
   });
 });
 
-let testMatch = ['Yes'];
-
-app.get('/mobile', (req: any, res: any) => {
-  console.log("Someone connected!");
-  res.json({test: "Coming from the backend!"});
-});
-
-app.post('/mobile/yes', (req: any, res: any) => {
-  console.log(req.body);
-  
-});
-
 const port = process.env.PORT || 9000;
 
 server.listen(port, () => {
