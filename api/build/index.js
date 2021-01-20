@@ -18,9 +18,13 @@ app.get('/', (req, res) => {
         res.send(data[0].name);
     });
 });
+let testMatch = ['Yes'];
 app.get('/mobile', (req, res) => {
     console.log("Someone connected!");
     res.json({ test: "Coming from the backend!" });
+});
+app.post('/mobile/yes', (req, res) => {
+    console.log(req.body);
 });
 const port = process.env.PORT || 9000;
 server.listen(port, () => {
