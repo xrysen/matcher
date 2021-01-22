@@ -12,8 +12,10 @@ function Nav(props: any) {
   const cookies = new Cookies();
 
   function logout() {
-    cookies.remove('email')
-    props.pageChange('login')
+    cookies.remove('email');
+    props.pageChange('login');
+    window.location.reload();
+    return false;
   }
 
   if (props.view === "login") {
@@ -36,7 +38,7 @@ function Nav(props: any) {
   return (
     <ul className="navbar-nav ml-auto">
       <li className={partner}>
-        <span className="nav-link" onClick={() => props.pageChange('partner')}>Partner Management
+        <span className="nav-link" onClick={() => props.pageChange('partner')}>Partners
         </span>
       </li>
       <li className={match}>
@@ -48,7 +50,7 @@ function Nav(props: any) {
         </span>
       </li>
       <li>
-        <span className="nav-link" onClick={() => logout()}>Logout     
+        <span className="nav-link right" onClick={() => logout()}>Logout     
         </span>
       </li>
     </ul>
@@ -58,7 +60,7 @@ function Nav(props: any) {
      return(
        <ul className="navbar-nav ml-auto">
          <li>
-           <span className="nav-link" onClick={() => props.pageChange('login')}>Login
+           <span className="nav-link right" onClick={() => props.pageChange('login')}>Login
            </span>
 
          </li>
