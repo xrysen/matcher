@@ -19,7 +19,7 @@ function App() {
   const [match, setMatch] = useState();
   const { selected, setSelected, userList, getUserList } = usePartnerData();
   const { view, pageChange } = useMainView();
-  const [user, setUser] = useState("");
+  const [user, setUser] = useState({});
   const [show, setShow] = useState(false);
   const cookies = new Cookies();
 
@@ -27,19 +27,19 @@ function App() {
     setShow(false);
     resetMatch();
   };
+  const { matchData, getMatchData, getUserByEmail } = useMatchData()
+
 
   const successfulLogin = function () {
-    setUser(cookies.get('email'));
+    setUser(getUserByEmail(cookies.get('email')));
   }
-  
-  const { matchData, getMatchData } = useMatchData();
 
   useEffect(() => {
     document.title = "Matchr";
   }, []);
 
   const loginRedirect = function () {
-    pageChange('partner') 
+    pageChange('partner')
   }
 
   const resetMatch = function () {
@@ -108,6 +108,7 @@ function App() {
               </Modal>
               <View
                 getUserList={getUserList}
+                getUserByEmail={getUserByEmail}
                 getMatchData={getMatchData}
                 cookies={cookies}
                 success={successfulLogin}

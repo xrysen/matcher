@@ -10,6 +10,7 @@ function PartnerList(props: any) {
       <h1>Partners</h1>
       <ul className="list">
       {props.partners && props.partners.map((element: any) => {
+        if (element.id !== (props.getUserByEmail(props.cookies.get('email'))).id)
         return <PartnerListItem select={props.select} selected={props.selected} id={element.id} name={element.name}/>
       })}
       </ul>

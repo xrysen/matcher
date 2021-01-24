@@ -5,10 +5,9 @@ import Matcher from "./Matcher";
 import PartnerList from "./PartnerList";
 import MatchList from "./MatchList";
 import Login from "./Login";
-import Cookies from "universal-cookie";
 
 function View(props: any) {
-  const match = <Matcher reset={props.reset} user={props.user} />;
+  const match = <Matcher reset={props.reset} user={props.user} partner={props.selected}/>;
 
   const login = (
     <Login
@@ -27,6 +26,8 @@ function View(props: any) {
       select={props.select}
       selected={props.selected}
       partners={props.partners}
+      cookies={props.cookies}
+      getUserByEmail={props.getUserByEmail}
     />
   );
 
@@ -40,7 +41,7 @@ function View(props: any) {
   } else if (!props.cookies.get("email")) {
     final = login;
   } else if (props.view === "match-list") {
-    props.getMatchData();
+    props.getMatchData(props.cookies.get('email'), props.selected);
     final = matchList;
   } else {
     final = match;

@@ -7,6 +7,8 @@ import {
   shuffleArray,
 } from "./externalAPI/yelp";
 
+import axios from "axios";
+
 require("dotenv").config();
 const pg = require("pg-promise")();
 const db = pg(
@@ -14,8 +16,12 @@ const db = pg(
 );
 const express = require("express");
 const http = require("http");
+const bodyParser = require("body-parser");
 
 const app = express();
+app.use(bodyParser.urlencoded({
+  extended: true
+}))
 const server = http.createServer(app);
 
 const io = require("socket.io")(server);
@@ -33,13 +39,15 @@ app.get("/", (req: any, res: any) => {
 
 app.get('/users', (req: any, res: any) => {
   db.query('SELECT * FROM users')
-  .then((data: any) => {
-    res.send(data);
-  })
-  .catch((err: any) => console.log("user call error", err));
+    .then((data: any) => {
+      res.send(data);
+    })
+    .catch((err: any) => console.log("user call error", err));
 });
 
-app.use('/matches/', matches(db));
+
+
+app.use('/matches', matches(db));
 
 const port = process.env.PORT || 9000;
 
@@ -55,7 +63,7 @@ server.listen(port, () => {
       for (const user in basket) {
         if (basket[user] = socket.id) {
           basket[user] = ""
-          ansObj[user] = {yay: [], nay: []}
+          ansObj[user] = { yay: [], nay: [] }
           console.log(`removed user ${user}`)
         }
       }
@@ -83,27 +91,28 @@ server.listen(port, () => {
       // THIS IS THE MATCHER LOGIC JOHN
       if (ans.ans === "yay") {
         for (const user in ansObj) {
-          if (ansObj[user]["yay"].includes(ans.restaurantPhone) && user !== ans.user) {
+          if (ansObj[user]["yay"].includes(ans.restaurantPhone) && user !== ans.user.email) {
             socket.broadcast.emit("match", ans.restaurant.name);
-
+            db.query('INSERT INTO matches (user_id, partner_id, restaurant) VALUES ($1, $2, $3);', [ans.user_id, ans.partner_id, ans.restaurant.name])
+              .catch((err: any) => console.error('Match query error', err))
             // send ans.user, user, ans.restaurant to DB as Match
             break;
           }
         }
-        if (!ansObj[ans.user]["yay"].includes(ans.restaurantPhone))
-        ansObj[ans.user]["yay"].push(ans.restaurantPhone);
+        if (!ansObj[ans.user.email]["yay"].includes(ans.restaurantPhone))
+          ansObj[ans.user.email]["yay"].push(ans.restaurantPhone);
       } else {
-        if (ansObj[ans.user]["yay"].includes(ans.restaurantPhone)) {
-          ansObj[ans.user]["yay"].splice(ansObj[ans.user]["yay"].indexOf(ans.restaurantPhone), 1)
+        if (ansObj[ans.user.email]["yay"].includes(ans.restaurantPhone)) {
+          ansObj[ans.user.email]["yay"].splice(ansObj[ans.user.email]["yay"].indexOf(ans.restaurantPhone), 1)
         }
-        ansObj[ans.user]["nay"].push(ans.restaurantPhone);
+        ansObj[ans.user.email]["nay"].push(ans.restaurantPhone);
       }
       console.log(ansObj);
     });
 
     socket.on("reset", (user: any) => {
       socket.to(basket[user]).emit('resetCarousel', 'resetCarousel')
-      ansObj[user] = {yay: [], nay: []}
+      ansObj[user] = { yay: [], nay: [] }
     });
 
     socket.on("change category", (response: any) => {
@@ -121,7 +130,7 @@ server.listen(port, () => {
   });
 });
 
-/* const testorants =  
+/* const testorants =
 [ { name: 'Dumpling House',
   image_url:
    'https://s3-media3.fl.yelpcdn.com/bphoto/BhSkksnrQr2XEriwIIsacQ/o.jpg',
