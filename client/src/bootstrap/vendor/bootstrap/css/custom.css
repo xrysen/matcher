@@ -1,15 +1,7 @@
 .bg-dark {
-  background-color:#846c9c;
+  background-color: black;
 }
 
 body {
-  background-color: #fffdf1;
-  background-image: url("https://www.transparenttextures.com/patterns/triangles.png");
-  font-family: 'Quicksand', sans-serif;
-}
-
-.Login {
-  justify-content: center;
-  margin-left: auto;
-  margin-right: auto
+  background-color: #2f4124;
 }

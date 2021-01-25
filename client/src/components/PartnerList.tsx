@@ -8,8 +8,7 @@ function PartnerList(props: any) {
     <div className="partners">
       <h1 className="mt-5">Partners</h1>
       <ul className="list">
-      {props.partners && props.partners.map((element: any) => {
-        if (element.id !== (props.getUserByEmail(props.cookies.get('email'))).id)
+      {props.partners.map((element: any) => {
         return <PartnerListItem select={props.select} selected={props.selected} id={element.id} name={element.name}/>
       })}
       </ul>
