@@ -20,7 +20,7 @@ $accent:  #85CDC9;
   .list-item {
     padding: 5px;
     text-align: center;
-
+    cursor: pointer;
   }
   :hover {
     background-color: $accent;
@@ -127,7 +127,7 @@ $accent:  #85CDC9;
 
 .restaurant {
   margin-left: auto; 
-  margin-right: 35%;
+  margin-right: auto;
   width: 550px;
   display: flex;
   flex-direction: column;
@@ -202,4 +202,13 @@ body {
 
 .quicksand {
   font-family: 'Quicksand', sans-serif !important;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.invite {
+  height: 50px;
+  width: 150px;
 }

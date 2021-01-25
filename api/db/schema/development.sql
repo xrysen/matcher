@@ -1,5 +1,11 @@
 INSERT INTO users (name, email) VALUES
+<<<<<<< HEAD
+  ('Bob Ross', 'Test@test.com'),
+  ('Bob Mango', 'bob@mango.com'),
+  ('Sue Mango', 'sue@mango.com'),
+=======
   ('Bob Ross', 'test@test.com'),
+>>>>>>> f02ae6a79c4aec911184786df8860559a7386fea
   ('Stanley Park', '4ever@stlyprk.bc.ca'),
   ('Bart Simpson', 'fart@farts.com'),
   ('Dante Cross', 'dantecross@outlook.com'),

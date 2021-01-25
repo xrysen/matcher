@@ -5,10 +5,10 @@ import io from "socket.io-client";
 import Partner from "./components/Partner";
 import usePartnerData from "./hooks/partnerData";
 import Nav from "./components/Nav";
+import ModalContainer from "./components/ModalContainer";
 import useMainView from "./hooks/mainView";
 import View from "./components/View";
 import useMatchData from "./hooks/getMatchData";
-import { Modal, Button } from "react-bootstrap";
 import Cookies from 'universal-cookie';
 
 const ENDPOINT = "http://localhost:9000";
@@ -16,26 +16,78 @@ const ENDPOINT = "http://localhost:9000";
 const socket = io(ENDPOINT);
 
 function App() {
-  const [match, setMatch] = useState();
-  const { selected, setSelected, userList, getUserList } = usePartnerData();
-  const { view, pageChange } = useMainView();
-  const [user, setUser] = useState({});
-  const [show, setShow] = useState(false);
   const cookies = new Cookies();
-
-  const handleClose = () => {
-    setShow(false);
-    resetMatch();
-  };
+  const [match, setMatch] = useState();
+  const [partner, setPartner] = useState()
+  const { selected, setSelected, userList } = usePartnerData();
+  const { view, pageChange } = useMainView();
   const { matchData, getMatchData, getUserByEmail } = useMatchData()
+  const [user, setUser] = useState({});
+  const [username, setUsername] = useState(cookies.get('username') ? cookies.get('username') : "");
+  const [show, setShow] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [request, setRequest] = useState();
+  
+  const partnerSelect = function(partner) {
+    setPartner(partner)
+  }
 
+  const inviteConfirm = function() {
+    setShowConfirm(true)
+  }
+
+  socket.on('invitation', (response) => {
+    setRequest({...response})
+    setShowInvite(true)
+  })
+
+  const handleClose = (type) => {
+    setShow(false);
+    setShowConfirm(false);
+    setShowInvite(false);
+    resetMatch();
+   };
+
+   const handleCloseSend = function () {
+      const responseObj = {user: user.email, username: username, parter: partner}
+      socket.emit('invite', responseObj)
+      pageChange('match')
+      setShowConfirm(false);
+   }
+
+   const handleCloseAccept = function () {
+     setShowInvite(false);
+     for (const partner of userList) {
+       if (partner.email === request.user) {
+         setSelected(partner.id);
+        }
+      }
+      pageChange('match')
+    }
+
+
+  const usernameAssign = function(user) {
+    if (user === "bob@mango.com") {
+      setUsername("Bob Mango")
+      cookies.set('username', "Bob Mango")
+    }
+
+    if (user === "sue@mango.com") {
+      setUsername("Sue Mango")
+      cookies.set('username', "Sue Mango")
+    }
+    
+  }
 
   const successfulLogin = function () {
     setUser(getUserByEmail(cookies.get('email')));
+    usernameAssign(cookies.get('email'));
   }
 
   useEffect(() => {
     document.title = "Matchr";
+    /* getUserList(); */
   }, []);
 
   const loginRedirect = function () {
@@ -43,15 +95,15 @@ function App() {
   }
 
   const resetMatch = function () {
-    socket.emit("reset", user);
+    socket.emit("reset", user.email);
     console.log("match reset");
     setMatch();
   };
 
   socket.on("match", (match) => {
     console.log(`We have a match!! ${match}`);
-    setMatch(match);
     setShow(true);
+    setMatch(match);
   });
 
   return (
@@ -73,7 +125,7 @@ function App() {
             <span className="navbar-toggler-icon"></span>
           </button>
           <div className="collapse navbar-collapse" id="navbarResponsive">
-            <Nav view={view} pageChange={pageChange} />
+            <Nav username={username} view={view} pageChange={pageChange} />
           </div>
         </div>
       </nav>
@@ -84,30 +136,34 @@ function App() {
                   return <Partner name={partner.name} email={partner.email} />
                 }
               })}
-              <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton>
-                  <Modal.Title>We Got One!</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                  Woohoo we found a match!{" "}
-                  {
-                    <a
-                      rel="noreferrer"
-                      target="_blank"
-                      href={`http://www.google.com/search?q=${match}`}
-                    >
-                      {match}
-                    </a>
-                  }
-                </Modal.Body>
-                <Modal.Footer>
-                  <Button variant="secondary" onClick={handleClose}>
-                    Close
-                  </Button>
-                </Modal.Footer>
-              </Modal>
+              <ModalContainer 
+                show={show}
+                handleClose={handleClose}
+                match={match}
+                type={"match"}
+              />
+              <ModalContainer 
+                request={request}
+                show={showInvite}
+                handleClose={handleClose}
+                handleCloseAccept={handleCloseAccept}
+                match={match}
+                type={"invite"}
+              />
+              <ModalContainer
+                partner={partner} 
+                show={showConfirm}
+                handleClose={handleClose}
+                handleCloseSend={handleCloseSend}
+                match={match}
+                type={"confirm"}
+              />
               <View
-                getUserList={getUserList}
+                partner={partner}
+                inviteConfirm={inviteConfirm}
+                partnerSelect={partnerSelect}
+                username={username}
+                /* getUserList={getUserList} */
                 getUserByEmail={getUserByEmail}
                 getMatchData={getMatchData}
                 cookies={cookies}

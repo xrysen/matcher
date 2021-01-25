@@ -13,7 +13,6 @@ function Nav(props: any) {
 
   function logout() {
     cookies.remove('email');
-    props.pageChange('login');
     window.location.reload();
     return false;
   }
@@ -37,6 +36,10 @@ function Nav(props: any) {
   if (cookies.get('email')) {
   return (
     <ul className="navbar-nav ml-auto">
+      <li className="nav-item right">
+        <span className="nav-link active">Logged In as: {props.username}
+        </span>
+      </li>
       <li className={partner}>
         <span className="nav-link" onClick={() => props.pageChange('partner')}>Partners
         </span>

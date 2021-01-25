@@ -31,12 +31,6 @@ app.get("/test", (req: any, res: any) => {
   res.send("Backend connected!");
 });
 
-app.get("/", (req: any, res: any) => {
-  db.any(`SELECT * FROM users`).then((data: any) => {
-    res.send(data[0].name);
-  });
-});
-
 app.get('/users', (req: any, res: any) => {
   db.query('SELECT * FROM users')
     .then((data: any) => {
@@ -92,8 +86,8 @@ server.listen(port, () => {
       if (ans.ans === "yay") {
         for (const user in ansObj) {
           if (ansObj[user]["yay"].includes(ans.restaurantPhone) && user !== ans.user.email) {
-            socket.broadcast.emit("match", ans.restaurant.name);
             db.query('INSERT INTO matches (user_id, partner_id, restaurant) VALUES ($1, $2, $3);', [ans.user_id, ans.partner_id, ans.restaurant.name])
+              .then(() => {socket.broadcast.emit("match", ans.restaurant.name)})
               .catch((err: any) => console.error('Match query error', err))
             // send ans.user, user, ans.restaurant to DB as Match
             break;
@@ -115,7 +109,12 @@ server.listen(port, () => {
       ansObj[user] = { yay: [], nay: [] }
     });
 
+    socket.on('invite', (response: any) => {
+      socket.broadcast.emit('invitation', response)
+    })
+
     socket.on("change category", (response: any) => {
+      console.log("response: " + response.partner)
       const restaurants = getRestaurantIdsWithFilter(response.category);
       restaurants.then((res: any) => {
         createRestaurantProfilesArr(res).then((res) => {

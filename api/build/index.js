@@ -17,11 +17,6 @@ const matches = require("./routes/matches");
 app.get("/test", (req, res) => {
     res.send("Backend connected!");
 });
-app.get("/", (req, res) => {
-    db.any(`SELECT * FROM users`).then((data) => {
-        res.send(data[0].name);
-    });
-});
 app.get('/users', (req, res) => {
     db.query('SELECT * FROM users')
         .then((data) => {
@@ -67,8 +62,8 @@ server.listen(port, () => {
             if (ans.ans === "yay") {
                 for (const user in ansObj) {
                     if (ansObj[user]["yay"].includes(ans.restaurantPhone) && user !== ans.user.email) {
-                        socket.broadcast.emit("match", ans.restaurant.name);
                         db.query('INSERT INTO matches (user_id, partner_id, restaurant) VALUES ($1, $2, $3);', [ans.user_id, ans.partner_id, ans.restaurant.name])
+                            .then(() => { socket.broadcast.emit("match", ans.restaurant.name); })
                             .catch((err) => console.error('Match query error', err));
                         // send ans.user, user, ans.restaurant to DB as Match
                         break;
@@ -89,7 +84,11 @@ server.listen(port, () => {
             socket.to(basket[user]).emit('resetCarousel', 'resetCarousel');
             ansObj[user] = { yay: [], nay: [] };
         });
+        socket.on('invite', (response) => {
+            socket.broadcast.emit('invitation', response);
+        });
         socket.on("change category", (response) => {
+            console.log("response: " + response.partner);
             const restaurants = yelp_1.getRestaurantIdsWithFilter(response.category);
             restaurants.then((res) => {
                 yelp_1.createRestaurantProfilesArr(res).then((res) => {
